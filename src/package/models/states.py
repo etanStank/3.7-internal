@@ -14,6 +14,25 @@ import chapter
 
 ready_states = []
 
+# Private Methods
+def getLines(raw: str) -> list:
+    """Splits a raw string into lines
+
+    Args:
+        raw (str): Raw string
+
+    Returns:
+        list: List of lines
+    """
+    lines=  []
+
+    raw_lines = raw.split('\n')
+    for line in raw_lines:
+        line = line.strip()
+        if line:
+            lines.append(line)
+    return lines
+
 # Constructor
 class State():
     def __init__(self, name: str) -> None:
@@ -24,6 +43,9 @@ class State():
         """
         self._name = name # State name
         ready_states.append(self) # Accessibility
+
+    def __repr__(self) -> str:
+        return f"State(name='{self._name}')"
 
     def update(self, chapter_object: object, state: str) -> Optional[str]:
         """Updates a state class, and runs the code if
@@ -48,8 +70,18 @@ class State():
                 print("Not callable")
                 return "Not callable"
 
-content_object = State("Content") # TODO: Organize this stuff better, like what. its annoying me.
-ready_states.append(content_object)
+
+# Event Methods
+def onReadyFire(chapter_object: chapter.Chapter) -> None:
+    """Code runs when state is "Ready"
+
+    Args:
+        chapter_object (chapter.Chapter)
+    """
+    print(chapter_object.stats)
+    print(f"Line count; {chapter_object.getStat('line_count')}")
+    print(f"Word count; {chapter_object.getStat('word_count')}")
+    print("ready fired")
 
 def onContentFire(chapter_object: chapter.Chapter) -> None:
     """Code runs when state is "Content"
@@ -59,9 +91,6 @@ def onContentFire(chapter_object: chapter.Chapter) -> None:
     """
     print("content fired")
 
-preparing_object = State("Preparing") # TODO: what I said above.
-ready_states.append(preparing_object)
-
 def onPreparingFire(chapter_object: chapter.Chapter):
     """Code runs when state is "Preparing"
 
@@ -70,6 +99,30 @@ def onPreparingFire(chapter_object: chapter.Chapter):
     """
     print("preparing fired")
 
-# Assignment
+    raw = chapter_object._raw
+    lines = getLines(raw)
+    chapter_object.lines = lines
+
+    # TODO: Calculations for stats
+    chapter_object.stats = {
+        "line_count": len(lines),
+        "word_count": sum(len(line.split()) for line in lines)
+    }
+
+    chapter_object.setstate("Ready")
+
+# Content Objects
+content_object = State("Content") # Content
+ready_states.append(content_object)
+
+preparing_object = State("Preparing") # Preparing
+ready_states.append(preparing_object)
+
+ready_object = State("Ready") # Ready
+ready_states.append(ready_object)
+
+
+# Add new Attributes
 setattr(content_object, "fire", onContentFire) # Content
 setattr(preparing_object, "fire", onPreparingFire) # Preaparing
+setattr(ready_object, "fire", onReadyFire) # Ready

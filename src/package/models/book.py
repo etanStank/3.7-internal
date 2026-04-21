@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 AVAILABLE_ID = 0
-
+AVAILABLE_BOOKS = []
 # Types
 
 @dataclass
@@ -36,6 +36,11 @@ class Book():
         # Mutable          
         self.chapters = []
 
+        AVAILABLE_BOOKS.append(self)
+    
+    def __repr__(self) -> str:
+        return f"Book(id={self._id}, name='{self._name}')"
+
     @property
     def id(self):
         return self._id
@@ -45,11 +50,23 @@ class Book():
         return self._name
     
     def AddChapter(self, chapterObject: object):
-        pass
+        self.chapters.append(chapterObject)
 
 
     
 # Public Methods
+def getBook(name: str) -> Optional[Book]:
+    for book in AVAILABLE_BOOKS:
+        if book.name == name:
+            return book
+    packet = bookCreation(name, [])
+    return Book(packet)
 
-def findBook(name: str) -> Optional[object]:
-    return False
+def getBooks() -> list:
+    return AVAILABLE_BOOKS
+
+def getBookById(id: int) -> Optional[object]:
+    for book in AVAILABLE_BOOKS:
+        if book.id == id:
+            return book
+    return None    
