@@ -9,10 +9,45 @@ TODO: Fix duplication, like why. Could add
 print("States Loaded")
 
 from typing import Optional
+from typing import TYPE_CHECKING
+from dataclasses import dataclass
 
-import chapter
+@dataclass
+class ChapterType():
+    _id: int
+    _file: str
+    _title: str
+    _raw: str
+    book: str
+    lines: list
+    stats: dict
+    _state: str
+    _observers: list
+    attach: function
+    getStat: function
+    getSnippet: function
+    setState: function
+    
 
 ready_states = []
+
+def newState(name: str) -> Optional[State]:
+    """Creates a new state object, and adds it to the ready states list
+
+    Args:
+        name (str): Name of state
+
+    Returns:
+        State: State object created
+    """
+    for state in ready_states:
+        if state._name == name:
+            raise ValueError(f"State with name '{name}' already exists.")
+            return None
+
+    new_state = State(name)
+    ready_states.append(new_state)
+    return new_state
 
 # Private Methods
 def getLines(raw: str) -> list:
@@ -42,12 +77,11 @@ class State():
             name (str): Name of state
         """
         self._name = name # State name
-        ready_states.append(self) # Accessibility
 
     def __repr__(self) -> str:
         return f"State(name='{self._name}')"
 
-    def update(self, chapter_object: object, state: str) -> Optional[str]:
+    def update(self, chapter_object: ChapterType, state: str) -> Optional[str]:
         """Updates a state class, and runs the code if
            if matches the name of the state
 
@@ -70,9 +104,17 @@ class State():
                 print("Not callable")
                 return "Not callable"
 
+def attachStates(chapter_object: ChapterType) -> None:
+    """Attaches all states to a chapter object
+
+    Args:
+        chapter_object (object): Chapter object
+    """
+    for state in ready_states:
+        chapter_object.attach(state)
 
 # Event Methods
-def onReadyFire(chapter_object: chapter.Chapter) -> None:
+def onReadyFire(chapter_object: ChapterType) -> None:
     """Code runs when state is "Ready"
 
     Args:
@@ -82,16 +124,9 @@ def onReadyFire(chapter_object: chapter.Chapter) -> None:
     print(f"Line count; {chapter_object.getStat('line_count')}")
     print(f"Word count; {chapter_object.getStat('word_count')}")
     print("ready fired")
+    print(f"Snippet; {chapter_object.getSnippet()}")
 
-def onContentFire(chapter_object: chapter.Chapter) -> None:
-    """Code runs when state is "Content"
-
-    Args:
-        chapter_object (chapter.Chapter)
-    """
-    print("content fired")
-
-def onPreparingFire(chapter_object: chapter.Chapter):
+def onPreparingFire(chapter_object: ChapterType):
     """Code runs when state is "Preparing"
 
     Args:
@@ -109,20 +144,16 @@ def onPreparingFire(chapter_object: chapter.Chapter):
         "word_count": sum(len(line.split()) for line in lines)
     }
 
-    chapter_object.setstate("Ready")
+    chapter_object.setState("Ready")
 
-# Content Objects
-content_object = State("Content") # Content
-ready_states.append(content_object)
-
-preparing_object = State("Preparing") # Preparing
-ready_states.append(preparing_object)
-
-ready_object = State("Ready") # Ready
-ready_states.append(ready_object)
-
+# State Objects
+preparing_object = newState("Preparing") # Preparing
+ready_object = newState("Ready") # Ready
 
 # Add new Attributes
-setattr(content_object, "fire", onContentFire) # Content
-setattr(preparing_object, "fire", onPreparingFire) # Preaparing
-setattr(ready_object, "fire", onReadyFire) # Ready
+def SetAttributes():
+    print(ready_states)
+    setattr(preparing_object, "fire", onPreparingFire) # Preaparing
+    setattr(ready_object, "fire", onReadyFire) # Ready
+
+SetAttributes()

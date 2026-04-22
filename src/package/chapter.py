@@ -6,6 +6,9 @@ from typing import Optional
 import states
 import book
 AVAILABLE_ID = 0
+SNIPPET_LINES = 3
+
+REGISTERED_CHAPTERS = []
 
 # Private Methods
 def remove_duplications(given_list: list):
@@ -69,6 +72,15 @@ class Chapter():
             str: Chapter's title
         """
         return self._file
+
+    def getSnippet(self) -> str:
+        snippet = []
+        for turn in range(SNIPPET_LINES):
+            snippet.append(self.lines[turn])
+        
+        return "\n".join(snippet)
+
+
     """ -- States -- """
     @property
     def state(self) -> str:
@@ -79,7 +91,7 @@ class Chapter():
         """
         return self._state
     
-    def setstate(self, state: str) -> str:
+    def setState(self, state: str) -> str:
         """Sets the current state to a new state
 
         Args:
@@ -156,6 +168,7 @@ class Chapter():
 
         # Temporary fix till I figure out why its duplicated
         # Like what and why
+        REGISTERED_CHAPTERS.append(self)
         remove_duplications(states.ready_states) 
         print(states.ready_states)
         book_object = book.getBook("Unknown")
@@ -166,9 +179,5 @@ class Chapter():
         print(book.getBooks())
         
         print("Initialization of Chapter complete.")
-
-        # Assign all states as observers
-        for state in states.ready_states:
-            self.attach(state)
         
-        self.setstate("Preparing")
+        self.setState("Preparing")
