@@ -93,15 +93,12 @@ class State():
             Optional[str]: Returns string if success, or error while calling
         """
         if state == self._name:
-            print(f"Checking {state} with object {self._name}")
             # Checks if has the function "fire"
             method_to_call = getattr(self, "fire", None)
             if callable(method_to_call):
-                print("Callable")
                 method_to_call(chapter_object)
                 return "Callable"
             else:
-                print("Not callable")
                 return "Not callable"
 
 def attachStates(chapter_object: ChapterType) -> None:
@@ -120,11 +117,7 @@ def onReadyFire(chapter_object: ChapterType) -> None:
     Args:
         chapter_object (chapter.Chapter)
     """
-    print(chapter_object.stats)
-    print(f"Line count; {chapter_object.getStat('line_count')}")
-    print(f"Word count; {chapter_object.getStat('word_count')}")
     print("ready fired")
-    print(f"Snippet; {chapter_object.getSnippet()}")
 
 def onPreparingFire(chapter_object: ChapterType):
     """Code runs when state is "Preparing"
@@ -137,6 +130,8 @@ def onPreparingFire(chapter_object: ChapterType):
     raw = chapter_object._raw
     lines = getLines(raw)
     chapter_object.lines = lines
+
+    print("getting to here")
 
     # TODO: Calculations for stats
     chapter_object.stats = {
@@ -152,7 +147,6 @@ ready_object = newState("Ready") # Ready
 
 # Add new Attributes
 def SetAttributes():
-    print(ready_states)
     setattr(preparing_object, "fire", onPreparingFire) # Preaparing
     setattr(ready_object, "fire", onReadyFire) # Ready
 

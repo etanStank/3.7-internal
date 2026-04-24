@@ -36,6 +36,11 @@ class Chapter():
             book (str): Assosicated book
         """
 
+        for chapter in REGISTERED_CHAPTERS:
+            if chapter._title == name:
+                print(f"Chapter with title '{name}' already exists.")
+                return
+
         # ID
         self._id = GetAvailableId() # Incase I need todo equality overrides
         self._file = name # TODO: Could remove
@@ -177,7 +182,9 @@ class Chapter():
             book_object.AddChapter(self)
         
         print(book.getBooks())
+
+        for state in states.ready_states:
+            self.attach(state)
         
         print("Initialization of Chapter complete.")
-        
         self.setState("Preparing")
