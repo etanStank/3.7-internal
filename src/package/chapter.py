@@ -3,6 +3,8 @@ print("Chapter Loaded")
 from optparse import Option
 from typing import Optional
 
+import os
+
 import states
 import book
 AVAILABLE_ID = 0
@@ -25,6 +27,25 @@ def GetAvailableId() -> int:
     AVAILABLE_ID = AVAILABLE_ID + 1
     return AVAILABLE_ID
 
+# Public Methods
+def GetChapterByName(name: str) -> Optional[Chapter]:
+    """Gets a chapter object by its name
+
+    Args:
+        name (str): Name of chapter to get
+
+    Returns:
+        Optional[object]: Chapter object if found, None if not found
+    """
+    name = name.lower()
+    for chapter in REGISTERED_CHAPTERS:
+        if chapter._title.lower() == name:
+            return chapter
+    return None
+
+def GetChapterTitle(title: str) -> str:
+    return os.path.splitext(title)[0]
+
 # Constructor
 class Chapter():
     def __init__(self, name: str, raw: str, book: str) -> None:
@@ -44,10 +65,10 @@ class Chapter():
         # ID
         self._id = GetAvailableId() # Incase I need todo equality overrides
         self._file = name # TODO: Could remove
-        self._title = name
+        self._title = GetChapterTitle(name)
 
         self._raw = raw # Only added if needed
-        self.book = "" # Overall book the chapter is in
+        self.book = None # Overall book the chapter is in
         self.lines = [] # Line objects or multidimensional
         self.stats = {} # Stats of chapter, like word count, etc
 

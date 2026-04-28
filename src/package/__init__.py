@@ -12,55 +12,112 @@ DEBUGGING = False
 DEMO = True
 
 from sre_parse import REPEAT_CHARS
-import time
-
 import chapter
 import reader
-import states
 
-REPEAT = 1
+"""
 
-#chapter1 = chapter.Chapter("Chapter1", "asd", "Book1")
+    DEMO INPUT MAPS
 
-#print(chapter1.state)
-#chapter1.setstate("Preparing")
+    1. Read full chapter
+    2. Read chapter by lines
+    3. Show registered chapters
+    4. Get stats of chapter
+    5. Exit demo
 
-def standard_start():
+
+"""
+
+def new_start():
     print("Starting Package")
     reader.init(DEMO, DEBUGGING)
 
-    if DEMO:
-        global REPEAT
-        print(f"Current Loop: {str(REPEAT)}")
-        REPEAT = REPEAT + 1
-        print("Starting demo")
-        reader.init(DEMO, DEBUGGING)
-        print(f"Registered chapters: {chapter.REGISTERED_CHAPTERS}")
-        print(f"\n\nWelcome to the demo! This is a terminal-based demonstration of the package's functionality. It processes chapter files and demonstrates state changes. Please check the output for details on the processing of each chapter and their states.")
-        function_input = input("What type of functionality would you like to see? (type 'exit' to quit)\n\nOptions:\n1. Process chapter files\n2. Show registered chapters\n3. Show states of chapters\n\n4. Read a chapter")
-        function_input = function_input.strip().lower()
-        if function_input == "exit":
-            print("Exiting demo. Thank you for trying it out!")
-        elif function_input == "2" or function_input == "show registered chapters":
-            print(chapter.REGISTERED_CHAPTERS)
-            for chapter_object in chapter.REGISTERED_CHAPTERS:
-                print(f"-" * 20)
-                print(f"Name: {chapter_object._title},\nBook: {chapter_object.book._name}\nState: {chapter_object._state}\n\n")
-                for stat in chapter_object.stats:
-                    print(f"{stat}: {chapter_object.stats[stat]}")
-        elif function_input == "3" or function_input == "show states of chapters":
-            for chapter_object in chapter.REGISTERED_CHAPTERS:
-                print(f"Chapter: {chapter_object._title}, States: {chapter_object._state}")
-        elif function_input == "4" or function_input == "read a chapter":
-            chapter_title = input("Enter the title of the chapter you want to read: ")
-            chapter_title = chapter_title.strip()
-            chapter_object = next((ch for ch in chapter.REGISTERED_CHAPTERS if ch._title == chapter_title), None)
-            if chapter_object:
-                print(f"-" * 20)
-                print(f"Name: {chapter_object._title},\nBook: {chapter_object.book._name}\nState: {chapter_object._state}\n\n")
-                for line in chapter_object.lines:
-                    print(line)
-            else:
-                print(f"Chapter with title '{chapter_title}' not found.")
+    # if they want to repeat
+    repeat = True
 
-standard_start()
+    if DEMO:
+        # if demo is on, starts demo loop
+        while repeat:
+            # i promise i tried my hardest to make this look nice
+            # i hate long strings i hate inputs
+            # and this is both combined
+            repeat = False
+            print(f"Registered chapters: {chapter.REGISTERED_CHAPTERS}")
+            print(f"\n\nWelcome to the demo! This is a terminal-based demonstration of the package's functionality. It processes chapter files and demonstrates state changes. Please check the output for details on the processing of each chapter and their states.")
+
+            # holy text
+
+            option_input = input(
+            "What type of functionality would you like to see? (type 'exit' to quit)\n\n"
+            "Options:\n"
+            "1. Read full chapter\n"
+            "2. Read chapter by lines\n"
+            "3. Show registered chapters\n"
+            "4. Get stats of chapter\n"
+            "5. Exit demo\n\n"
+            ).strip().lower()
+
+            # Option 1: Read full chapter
+            if option_input in ["1", "read full chapter"]:
+                chapter_title = input("Enter the title of the chapter you want to read: ").strip().lower()
+                chapter_object = chapter.GetChapterByName(chapter_title)
+                if chapter_object:
+                    print(f"-" * 20)
+                    print(f"Name: {chapter_object._title},\nState: {chapter_object._state}\n\n")
+                    for line in chapter_object.lines:
+                        print(f"{line}\n\n")
+                else:
+                    print(f"Chapter with title '{chapter_title}' not found.")
+
+            # Option 2: Read chapter by lines
+            elif option_input in ["2", "read chapter by lines"]:
+                chapter_title = input("Enter the title of the chapter you want to read: ").strip().lower()
+                chapter_object = chapter.GetChapterByName(chapter_title)
+                viewing = True
+                if chapter_object:
+                    print(f"-" * 20)
+                    print(f"Name: {chapter_object._title},\nState: {chapter_object._state}\n\n")
+                    while viewing:
+                        line_input = input("Type 'next' to view the next line, or 'exit' to stop viewing: ").strip().lower()
+                        if line_input == "next":
+                            if chapter_object.lines:
+                                print(chapter_object.lines[0])
+                                chapter_object.lines.pop(0)
+                            else:
+                                print("No more lines to view.")
+                                viewing = False
+                        elif line_input == "exit":
+                            viewing = False
+                else:
+                    print(f"Chapter with title '{chapter_title}' not found.")
+            
+            # Option 3: Show registered chapters
+            elif option_input in ["3", "show registered chapters"]:
+                print("Registered Chapters:")
+                for chapter_object in chapter.REGISTERED_CHAPTERS:
+                    print(f"- {chapter_object._title} (State: {chapter_object._state})")
+
+            # Option 4: Get stats of chapter
+            elif option_input in ["4", "get stats of chapter"]:
+                chapter_title = input("Enter the title of the chapter you want to get stats of: ").strip().lower()
+                chapter_object = chapter.GetChapterByName(chapter_title)
+                if chapter_object:
+                    print(f"Stats for Chapter '{chapter_object._title}':")
+                    for stat_key, stat_value in chapter_object.stats.items():
+                        print(f"- {stat_key}: {stat_value}")
+                else:
+                    print(f"Chapter with title '{chapter_title}' not found.")
+
+            # Option 5: Exit demo
+            elif option_input in ["5", "exit demo"]:
+                print("Exiting demo. Goodbye")
+                break
+            
+            # Repeat option
+            again = input("\nDo you want to do something else? (y/n): ").strip().lower()
+            if again in ["y", "yes"]:
+                repeat = True
+            elif again not in ["y", "yes"]:
+                repeat = False
+                print("Goodbye")
+new_start()
