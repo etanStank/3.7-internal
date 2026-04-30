@@ -1,10 +1,14 @@
 from dataclasses import dataclass
 
+# Data structures
+
 @dataclass
 class case:
     scenario: str
     file_name: str
     expect_error: bool
+
+# Test cases
 
 cases = [
     case("Valid chapter file", "lotmTest.txt", False), # Temporary case
