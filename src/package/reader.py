@@ -98,7 +98,7 @@ def init(demo: bool, debugging: bool) -> None:
         # Runs only if DEBUGGING is active
         print("Preparing test cases")
 
-        for case in cases.cases:
+        for case in cases.file_cases:
             # Loops through all test cases in cases.py
             print(f"Testing case: {case.scenario}")
 

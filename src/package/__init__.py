@@ -1,16 +1,19 @@
 """Acts as a demo and testing ground for the package."""
 
+from sre_constants import SUCCESS
+
 import chapter
 import reader
+import test.cases
 
 # Easy management of demo, and debugging modes
 # allowing for easy switching between the two modes
 # Debugging mode allows for testing using the cases.py file
-DEBUGGING = False
+DEBUGGING = True
 
 # Demo mode allows for the __init__.py file to run a
 # terminal-based demo of the package.
-DEMO = True
+DEMO = False
 
 
 def start():
@@ -205,6 +208,9 @@ def start():
                 print("Exiting demo. Goodbye")
                 break
 
+            else:
+                print("Not a valid option")
+
             # Checks if you want to use the terminal again after
             # compeleting whatever function you originally wanted
             # strips, and lowers (makes it lowercase) the text for
@@ -222,6 +228,33 @@ def start():
             else:
                 repeat = False
                 print("Goodbye")
+    elif DEBUGGING:
+        # Debugging mode for terminal-based demo
+        print("Beginning terminal test cases")
+        for case in test.cases.option_inputs:
+            # Goes through each OPTION_INPUTS
+            # Result gets print
+            result = None
+
+            # Changed for simplicity, to make
+            # the code more readable
+            option = case.file_name
+
+            # Checks if it is an appropriate option (long list)
+            # 
+            if option in ["1", "read full chapter", "2", "read chapter by lines", "3", "show registered chapters", "4", "get stats of chapter", "5", "exit demo"]:
+                if case.expect_error == False:
+                    result = "🟢 Case '{case.scenario}' passed without error."
+                elif case.expect_error:
+                    result = "🟠 Case '{case.scenario}' expected an error, but passed anyway"
+            else:
+                if case.expect_error:
+                    result = "🟢 Case '{case.scenario}' passed with an error"
+                else:
+                    result = "🟠 Case '{case.scenario}' expected an error"
+
+            print(result)
+
 
 
 start()
